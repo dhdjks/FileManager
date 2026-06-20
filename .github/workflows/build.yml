@@ -23,15 +23,21 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Restore Gradle packages
-        uses: gradle/gradle-build-action@v3
-        with:
-          gradle-execution-visible: false
+      - name: Setup specific Gradle version
+        run: |
+          mkdir -p gradle/wrapper
+          echo 'distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+distributionUrl=https\://services.gradle.org/distributions/gradle-8.5-bin.zip
+networkTimeout=10000
+validateDistributionUrl=true
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists' > gradle/wrapper/gradle-wrapper.properties
 
-      - name: Generate Gradle Wrapper
+      - name: Download Gradle wrapper jar
         run: |
           if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
-            gradle wrapper --gradle-version 8.2
+            curl -sL -o gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.5.0/gradle/wrapper/gradle-wrapper.jar
           fi
 
       - name: Grant execute permission for gradlew
