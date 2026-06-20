@@ -130,7 +130,7 @@ class FileManagerViewModel @Inject constructor(
             val result = repository.paste(_uiState.value.currentPath)
             result.fold(
                 onSuccess = { refreshCurrentDirectory() },
-                onFailure = { _uiState.update { it.copy(error = it.message) } }
+                onFailure = { error -> _uiState.update { it.copy(error = error.message) } }
             )
             updateClipboardState()
         }
@@ -152,7 +152,7 @@ class FileManagerViewModel @Inject constructor(
             val result = repository.rename(item, newName)
             result.fold(
                 onSuccess = { refreshCurrentDirectory() },
-                onFailure = { _uiState.update { it.copy(error = it.message) } }
+                onFailure = { error -> _uiState.update { it.copy(error = error.message) } }
             )
         }
     }
@@ -162,7 +162,7 @@ class FileManagerViewModel @Inject constructor(
             val result = repository.createFolder(_uiState.value.currentPath, name)
             result.fold(
                 onSuccess = { refreshCurrentDirectory() },
-                onFailure = { _uiState.update { it.copy(error = it.message) } }
+                onFailure = { error -> _uiState.update { it.copy(error = error.message) } }
             )
         }
     }
