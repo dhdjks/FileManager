@@ -23,24 +23,20 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Gradle Wrapper
+      - name: Download and setup Gradle 8.5
         run: |
-          mkdir -p gradle/wrapper
-          cat > gradle/wrapper/gradle-wrapper.properties << 'EOF'
-          distributionBase=GRADLE_USER_HOME
-          distributionPath=wrapper/dists
-          distributionUrl=https\://services.gradle.org/distributions/gradle-8.5-bin.zip
-          networkTimeout=10000
-          validateDistributionUrl=true
-          zipStoreBase=GRADLE_USER_HOME
-          zipStorePath=wrapper/dists
-          EOF
+          cd $HOME
+          curl -sL -o gradle-8.5-bin.zip https://services.gradle.org/distributions/gradle-8.5-bin.zip
+          unzip -q gradle-8.5-bin.zip
+          echo "$HOME/gradle-8.5/bin" >> $GITHUB_PATH
+          export PATH="$HOME/gradle-8.5/bin:$PATH"
+          gradle --version
 
-      - name: Download Gradle wrapper jar
+      - name: Generate Gradle Wrapper
         run: |
-          if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
-            curl -sL -o gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.5.0/gradle/wrapper/gradle-wrapper.jar
-          fi
+          export PATH="$HOME/gradle-8.5/bin:$PATH"
+          gradle wrapper --gradle-version 8.5
+          ls -la gradle/wrapper/
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
