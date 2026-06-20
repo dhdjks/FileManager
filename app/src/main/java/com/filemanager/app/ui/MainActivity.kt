@@ -47,11 +47,10 @@ import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material.icons.filled.Paste
+import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.SdStorage
 import androidx.compose.material.icons.filled.SortByAlpha
-import androidx.compose.material.icons.filled.SortByAttributes
 import androidx.compose.material.icons.filled.VideoFile
 import androidx.compose.material.icons.filled.ViewList
 import androidx.compose.material3.AlertDialog
@@ -98,6 +97,7 @@ import com.filemanager.app.domain.model.ViewMode
 import com.filemanager.app.presentation.viewmodel.FileManagerViewModel
 import com.filemanager.app.ui.theme.ApkGreen
 import com.filemanager.app.ui.theme.AudioGreen
+import com.filemanager.app.ui.theme.FileManagerTheme
 import com.filemanager.app.ui.theme.DocBlue
 import com.filemanager.app.ui.theme.FileGray
 import com.filemanager.app.ui.theme.FolderYellow
@@ -206,7 +206,7 @@ fun FileManagerApp(
                                         viewModel.setSortType(SortType.SIZE)
                                         showSortMenu = false
                                     },
-                                    leadingIcon = { Icon(Icons.Default.SortByAttributes, null) }
+                                    leadingIcon = { Icon(Icons.Default.Description, null) }
                                 )
                                 DropdownMenuItem(
                                     text = { Text("按时间排序") },
@@ -283,7 +283,7 @@ fun FileManagerApp(
                             } else if (uiState.hasClipboard) {
                                 IconButton(onClick = { viewModel.paste() }) {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Icon(Icons.Default.Paste, contentDescription = "粘贴", tint = MaterialTheme.colorScheme.primary)
+                                        Icon(Icons.Default.ContentPaste, contentDescription = "粘贴", tint = MaterialTheme.colorScheme.primary)
                                         Text("粘贴", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
                                     }
                                 }
