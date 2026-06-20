@@ -53,6 +53,7 @@ import androidx.compose.material.icons.filled.SdStorage
 import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material.icons.filled.VideoFile
 import androidx.compose.material.icons.filled.ViewList
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -133,6 +134,8 @@ fun FileManagerApp(
     var showRenameDialog by remember { mutableStateOf<FileItem?>(null) }
     var showSortMenu by remember { mutableStateOf(false) }
     var showFileOptionsSheet by remember { mutableStateOf<FileItem?>(null) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var pendingDeleteItem by remember { mutableStateOf<FileItem?>(null) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -271,7 +274,7 @@ fun FileManagerApp(
                                         Text("剪切", style = MaterialTheme.typography.labelSmall)
                                     }
                                 }
-                                IconButton(onClick = { viewModel.deleteSelected() }) {
+                                IconButton(onClick = { pendingDeleteItem = null; showDeleteDialog = true }) {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                         Icon(Icons.Default.Delete, contentDescription = "删除", tint = MaterialTheme.colorScheme.error)
                                         Text("删除", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.error)
@@ -401,6 +404,50 @@ fun FileManagerApp(
             )
         }
 
+        if (showDeleteDialog) {
+            val isSingleDelete = pendingDeleteItem != null
+            val itemName = pendingDeleteItem?.name ?: ""
+            val selectedCount = uiState.selectedItems.size
+
+            AlertDialog(
+                onDismissRequest = { showDeleteDialog = false },
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically, spacing = 8.dp) {
+                        Icon(Icons.Default.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+                        Text("确认删除")
+                    }
+                },
+                text = {
+                    if (isSingleDelete) {
+                        Text("确定要删除 \"$itemName\" 吗？此操作无法撤销。", style = MaterialTheme.typography.bodyLarge)
+                    } else {
+                        Text("确定要删除已选中的 $selectedCount 个项目吗？此操作无法撤销。", style = MaterialTheme.typography.bodyLarge)
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            if (isSingleDelete) {
+                                pendingDeleteItem?.let { viewModel.toggleSelection(it) }
+                            }
+                            viewModel.deleteSelected()
+                            pendingDeleteItem = null
+                            showDeleteDialog = false
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                    ) {
+                        Text("删除")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { pendingDeleteItem = null; showDeleteDialog = false }) {
+                        Text("取消")
+                    }
+                }
+            )
+        }
+
+
         showFileOptionsSheet?.let { item ->
             FileOptionsBottomSheet(
                 item = item,
@@ -410,8 +457,8 @@ fun FileManagerApp(
                     showRenameDialog = item
                 },
                 onDelete = {
-                    viewModel.toggleSelection(item)
-                    viewModel.deleteSelected()
+                    pendingDeleteItem = item
+                    showDeleteDialog = true
                     showFileOptionsSheet = null
                 }
             )
